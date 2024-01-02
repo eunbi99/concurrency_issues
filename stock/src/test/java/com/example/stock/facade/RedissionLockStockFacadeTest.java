@@ -15,10 +15,10 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class NamedLockStockFacadeTest {
+class RedissionLockStockFacadeTest {
 
     @Autowired
-    private NamedLockStockFacade namedLockStockFacade;
+    private RedissionLockStockFacade redissionLockStockFacade;
     @Autowired
     private StockRepository stockRepository;
 
@@ -35,15 +35,13 @@ class NamedLockStockFacadeTest {
     @Test
     public void 동시에_100개의_요청() throws InterruptedException {
         int threadCount = 100;
-        // newFixedThreadPool : 인자 개수만큼 고정된 쓰레드풀을 만든다.
         ExecutorService executorService = Executors.newFixedThreadPool(32);
-        //CountDownLatch는 어떤 쓰레드가 다른 쓰레드에서 작업이 완료될 때 까지 기다릴 수 있도록 해주는 클래스.
         CountDownLatch latch = new CountDownLatch(threadCount);
 
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    namedLockStockFacade.decrease(1L, 1L);
+                    redissionLockStockFacade.decrease(1L, 1L);
                 } finally {
                     latch.countDown(); // latch의 숫자가 1개씩 감소
                 }
